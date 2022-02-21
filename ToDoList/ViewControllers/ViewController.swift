@@ -9,6 +9,17 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        DispatchQueue.global().sync { [weak self] in
+            guard let tasks = TaskCachService.tasks else { return }
+            self?.taskArray = tasks
+        }
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
@@ -22,11 +33,7 @@ class ViewController: UIViewController {
             action: #selector(buttonAction),
             for: .touchUpInside
         )
-        
-        DispatchQueue.global().async { [weak self] in
-            guard let tasks = TaskCachService.tasks else { return }
-            self?.taskArray = tasks
-        }
+
         tableView.reloadData()
     }
     
@@ -35,7 +42,7 @@ class ViewController: UIViewController {
     private let tableView: UITableView = UITableView()
     private var taskArray: [CellTask] = [] {
         didSet {
-            DispatchQueue.global().sync {
+            DispatchQueue.global().async {
                 TaskCachService.tasks = self.taskArray
             }
         }
@@ -79,16 +86,11 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 }
 
 extension ViewController: AddOrChangeTaskViewControllerDelegate {
-    func changeData(_ title: String?, _ description: String?, _ indexPath: IndexPath) {
-        let task = Task(
-            title: title ?? "",
-            description: description ?? ""
-        )
-        let cellTask = CellTask(
-            task: task,
-            done: false
-        )
-        self.taskArray[indexPath.row] = cellTask
+    func changeData(_ title: String?, _ description: String?, _ done: Bool?, _ indexPath: IndexPath?) {
+        
+        guard let indexPath = indexPath else { return }
+        self.taskArray[indexPath.row].task.title = title ?? ""
+        self.taskArray[indexPath.row].task.description = description ?? ""
                 
         tableView.reloadData()
     }
@@ -111,6 +113,7 @@ extension ViewController: AddOrChangeTaskViewControllerDelegate {
 extension ViewController: TaskTableViewCellDelegate {
     func flagChange(_ flag: Bool, _ indexPath: IndexPath?) {
         guard let index = indexPath else { return }
+        print("-----\(index) \(flag)")
         taskArray[index.row].done = flag
     }
 }

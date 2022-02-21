@@ -9,7 +9,7 @@ import UIKit
 
 protocol AddOrChangeTaskViewControllerDelegate: AnyObject {
     func saveData(_ title: String?, _ description: String?)
-    func changeData(_ title: String?, _ description: String?, _ indexPath: IndexPath)
+    func changeData(_ title: String?, _ description: String?, _ done: Bool?, _ indexPath: IndexPath?)
 }
 
 class AddOrChangeTaskViewController: UIViewController {
@@ -40,7 +40,7 @@ class AddOrChangeTaskViewController: UIViewController {
                 action: #selector(buttonActionChange),
                 for: .touchUpInside
             )
-            guard let taskCell = cellTask else { return }
+            guard let taskCell = task else { return }
             titleField.text = taskCell.task.title
             descriptionField.text = taskCell.task.description
             //buttonSave.isHidden = true
@@ -66,12 +66,12 @@ class AddOrChangeTaskViewController: UIViewController {
     private var cellIndexPath: IndexPath?
 
     @objc private func buttonActionChange(_ sender: UIButton) {
-        guard let indexCell = indexPath else { return }
+        guard let index = indexPath else { return }
         if titleField.text == "" {
             return
         }
         print("Change")
-        self.delegate?.changeData(titleField.text, descriptionField.text, indexCell)
+        self.delegate?.changeData(titleField.text, descriptionField.text, cellTask?.done, index)
         self.dismiss(animated: true, completion: nil)
     }
     

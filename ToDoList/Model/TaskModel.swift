@@ -8,12 +8,12 @@
 import Foundation
 
 struct Task: Codable {
-    let title: String
-    let description: String
+    var title: String
+    var description: String
 }
 
 struct CellTask: Codable {
-    let task: Task
+    var task: Task
     var done: Bool
 }
 

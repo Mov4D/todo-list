@@ -39,7 +39,6 @@ class CheckView: UIControl {
     private var flag = false {
         didSet {
             changeStyle()
-            self.delegate?.flagChange(self.flag)
         }
     }
     
@@ -58,6 +57,8 @@ class CheckView: UIControl {
     
     @objc private func changeFlag(_ sender: UIControl) {
         flag = !flag
+        self.delegate?.flagChange(self.flag)
+
     }
     
 }
